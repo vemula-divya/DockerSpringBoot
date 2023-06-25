@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  db-temp:
+    image: mysql:8.0.27
+    ports:
+      - 3307:3306	 
+    restart: always
+    environment:
+      MYSQL_DATABASE: localspringdb
+      MYSQL_USER: vemula
+      MYSQL_PASSWORD: vemula
+      MYSQL_ROOT_PASSWORD: vemula
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  app:
+    image: vemuladivya/sb:0.0.1
+    restart: always
+    build: .
+    ports:
+      - 8080:8080
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-temp:3306/localspringdb?autoReconnect=true&allowPublicKeyRetrieval=true&useSSL=false
+      SPRING_DATASOURCE_USERNAME: vemula
+      SPRING_DATASOURCE_PASSWORD: vemula
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_DATABASE-PLATFORM: org.hibernate.dialect.MySQL8Dialect
+      SPRING_JPA_HIBERNATE_DDL-AUTO: 'update'
+      SPRING_JPA_SHOW-SQL: 'true'
+    depends_on:
+      - db-temp
+
+volumes:
+  mysql-data:
